@@ -1,0 +1,117 @@
+---
+- name: download caddy
+  get_url:
+    url: "{{ caddy_download_url }}/{{ caddy_arch }}?license={{ caddy_license }}&telemetry=off&plugins={{ caddy_plugins | join(',') }}"
+    dest: /opt/caddy.tar.gz
+    owner: root
+    group: root
+    mode: 0640
+    timeout: 120
+
+- name: create installation directory
+  file:
+    path: /opt/caddy
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: extract caddy archive
+  unarchive:
+    src: /opt/caddy.tar.gz
+    dest: /opt/caddy
+    remote_src: true
+
+- name: link caddy
+  file:
+    src: /opt/caddy/caddy
+    dest: /usr/local/bin/caddy
+    state: link
+    owner: root
+    group: root
+    mode: 0755
+
+- name: create configuration home
+  file:
+    path: /etc/caddy
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: create vhosts configuration home
+  file:
+    path: /etc/caddy/vhosts
+    state: directory
+    owner: root
+    group: www-data
+    mode: 0750
+
+- name: create main configuration
+  copy:
+    src: etc/caddy/Caddyfile
+    dest: /etc/caddy/Caddyfile
+    owner: root
+    group: www-data
+    mode: 0640
+
+- name: create dummy vhost home
+  file:
+    path: /var/www/dummy
+    state: directory
+    owner: root
+    group: www-data
+    mode: 0755
+
+- name: create dummy vhost
+  copy:
+    src: "{{ item }}"
+    dest: "/{{ item }}"
+    owner: root
+    group: www-data
+    mode: 0644
+  with_items:
+    - etc/caddy/vhosts/dummy.conf
+    - var/www/dummy/index.txt
+
+- name: check caddy env
+  stat:
+    path: /etc/default/caddy
+  register: caddy_stat
+
+- pause:
+    prompt: "insert cloudflare dns api token"
+  register: api_token
+  when: not caddy_stat.stat.exists
+
+- name: create caddy env
+  template:
+    src: etc/default/caddy.j2
+    dest: /etc/default/caddy
+    owner: root
+    group: www-data
+    mode: 0650
+  when: not caddy_stat.stat.exists
+
+- name: create caddypath
+  file:
+    path: /etc/ssl/caddy
+    state: directory
+    owner: root
+    group: www-data
+    mode: 0770
+
+- name: create systemd service
+  copy:
+    src: etc/systemd/system/caddy.service
+    dest: /etc/systemd/system/caddy.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: start caddy
+  systemd:
+    name: caddy
+    state: started
+    daemon_reload: true
+    enabled: true

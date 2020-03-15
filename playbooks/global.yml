@@ -1,0 +1,19 @@
+---
+#
+# Global stuff
+#
+- hosts: auyfan_buster
+  become: yes
+  roles:
+    - auyfan-buster
+
+#
+# Specific applications
+#
+- hosts: arf.home.bendem.be
+  become: yes
+  roles:
+    - database-server
+    - php-fpm
+    - web-server
+    - nextcloud

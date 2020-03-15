@@ -1,0 +1,37 @@
+---
+- name: preinstalled packages are uninstalled
+  apt:
+    name:
+      - alsa-utils 
+      - build-essential
+      - binutils
+      - cifs-utils
+      - cpp
+      - cpp-8
+      - dosfstools
+      - eatmydata
+      - g++
+      - g++-8
+      - gcc
+      - gcc-8
+      - dhcpcd5
+      - libavahi-common3
+      - libbluetooth3
+      - make
+      - nano
+      - rsyslog
+      - wireless-tools
+      - wpasupplicant
+    state: absent
+    autoremove: true
+    purge: true
+
+- name: install default packages
+  apt:
+    name:
+      - curl
+      - git
+      - gpg
+      - htop
+      - man
+      - tmux

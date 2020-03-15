@@ -1,0 +1,3 @@
+import vhosts/*.conf
+
+# vim: ft=conf

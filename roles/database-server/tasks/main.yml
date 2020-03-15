@@ -1,0 +1,21 @@
+---
+- name: add postgresql apt key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+
+- name: add postgresql apt source
+  apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+
+- name: install postgresql
+  apt:
+    pkg:
+      - postgresql-11
+      - python-psycopg2
+  register: postgresql_installed
+
+- name: start postgresql
+  systemd:
+    name: postgresql@11-main
+    state: started
+    enabled: yes
