@@ -55,25 +55,6 @@
     group: www-data
     mode: 0640
 
-- name: create dummy vhost home
-  file:
-    path: /var/www/dummy
-    state: directory
-    owner: root
-    group: www-data
-    mode: 0755
-
-- name: create dummy vhost
-  copy:
-    src: "{{ item }}"
-    dest: "/{{ item }}"
-    owner: root
-    group: www-data
-    mode: 0644
-  with_items:
-    - etc/caddy/vhosts/dummy.conf
-    - var/www/dummy/index.txt
-
 - name: check caddy env
   stat:
     path: /etc/default/caddy
@@ -100,6 +81,36 @@
     owner: root
     group: www-data
     mode: 0770
+
+- name: create caddy log home
+  file:
+    path: /var/log/caddy
+    state: directory
+    owner: root
+    group: www-data
+    mode: 0770
+
+- name: create dummy vhost home
+  file:
+    path: /var/www/dummy
+    state: directory
+    owner: root
+    group: www-data
+    mode: 0755
+
+- name: create dummy vhost
+  copy:
+    src: "{{ item }}"
+    dest: "/{{ item }}"
+    owner: root
+    group: www-data
+    mode: 0644
+  with_items:
+    - etc/caddy/vhosts/dummy.conf
+    - etc/caddy/gzip.conf
+    - etc/caddy/realip-cloudflare.conf
+    - etc/caddy/tls-cloudflare.conf
+    - var/www/dummy/index.txt
 
 - name: create systemd service
   copy:

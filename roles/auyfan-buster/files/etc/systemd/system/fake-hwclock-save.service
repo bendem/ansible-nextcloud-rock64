@@ -1,9 +1,0 @@
-[Unit]
-Description=fake-hwclock: save time to disk
-Documentation=man:fake-hwclock(8)
-After=fake-hwclock.service
-Requires=fake-hwclock.service
-
-[Service]
-Type=oneshot
-ExecStart=/sbin/fake-hwclock save

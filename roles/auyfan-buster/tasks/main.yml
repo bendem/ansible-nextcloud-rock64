@@ -25,13 +25,3 @@
     state: absent
     autoremove: true
     purge: true
-
-- name: install default packages
-  apt:
-    name:
-      - curl
-      - git
-      - gpg
-      - htop
-      - man
-      - tmux

@@ -11,7 +11,7 @@
   apt:
     pkg:
       - postgresql-11
-      - python-psycopg2
+      - python3-psycopg2
   register: postgresql_installed
 
 - name: start postgresql

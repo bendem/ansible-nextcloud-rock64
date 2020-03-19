@@ -1,0 +1,23 @@
+{{ inventory_hostname }} {
+    root /var/www/nextcloud
+    log /var/log/caddy/{{ inventory_hostname }}_access.log
+    errors /var/log/caddy/{{ inventory_hostname }}_errors.log
+
+    import ../tls-cloudflare.conf
+    import ../realip-cloudflare.conf
+    import ../gzip.conf
+    
+    fastcgi / /var/run/php/php{{ php_version }}-fpm.sock php
+
+    internal /data
+    internal /config
+
+    # rewrite {
+    #     if {path} not_starts_with /assets
+    #     if {path} not_starts_with /themes
+    #     if {path} not_starts_with /data/favicons
+    #     if {path} not /
+    #     if {path} not ''
+    #     to /
+    # }
+}

@@ -1,0 +1,13 @@
+- hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: install default packages
+  apt:
+    name:
+      - curl
+      - git
+      - gpg
+      - htop
+      - man
+      - tmux
+      - bash-completion

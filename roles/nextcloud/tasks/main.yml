@@ -1,8 +1,101 @@
 ---
-#
-# * install postgresql
-# * install php
-# * install caddy
-# * install nextcloud
-#
-- 
+- name: download nextcloud
+  get_url:
+    url: "https://download.nextcloud.com/server/releases/nextcloud-{{ nextcloud_version }}.tar.bz2"
+    dest: /opt/nextcloud.tar.bz2
+    sha256sum: "{{ nextcloud_archive_hash }}"
+    owner: root
+    group: root
+
+- file:
+    path: /var/www/nextcloud
+    state: directory
+
+- name: extract nextcloud
+  unarchive:
+    src: /opt/nextcloud.tar.bz2
+    dest: /var/www/nextcloud
+    remote_src: true
+    extra_opts:
+      - --strip-components=1
+    owner: root
+    group: www-data
+    creates: /var/www/nextcloud/occ
+
+- name: nextcloud has a place to store data
+  file:
+    path: /var/www/nextcloud/data
+    state: directory
+    owner: root
+    group: www-data
+    mode: 0770
+
+- name: nextcloud has write access where needed
+  file:
+    path: "/var/www/nextcloud/{{ item }}"
+    mode: 0770
+  with_items:
+    - config
+    - apps
+
+- name: "create nextcloud database user"
+  postgresql_user:
+    name: "www-data"
+    password: 1234
+    role_attr_flags: "LOGIN"
+  become_user: "postgres"
+
+- name: "create nextcloud database"
+  postgresql_db:
+    name: "nextcloud"
+    encoding: "UTF-8"
+    owner: "www-data"
+  become_user: "postgres"
+
+- name: run occ install
+  command: php /var/www/nextcloud/occ -v maintenance:install \
+    --database=pgsql \
+    --database-name=nextcloud \
+    --database-pass=1234 \
+    --database-user=www-data \
+    --admin-user=bendem \
+    --admin-email=online+arf@bendem.be \
+    --admin-pass=1234
+  args:
+    creates: /var/www/nextcloud/data/index.html
+  become_user: www-data
+
+- name: nextcloud accepts {{ inventory_hostname }} domain
+  command: php /var/www/nextcloud/occ config:system:set trusted_domains 1 --value="{{ inventory_hostname }}"
+  become_user: www-data
+
+- name: nextcloud systemd cron exists
+  copy:
+    src: "{{ item }}"
+    dest: "/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - etc/systemd/system/nextcloud-cron.service
+    - etc/systemd/system/nextcloud-cron.timer
+
+- name: nextcloud systemd cron is enabled
+  systemd:
+    name: nextcloud-cron.timer
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: nextcloud cron is setup
+  command: php /var/www/nextcloud/occ config:app:set core backgroundjobs_mode --value=cron
+  become_user: www-data
+
+- name: install nextcloud vhost
+  template:
+    src: etc/caddy/vhosts/nextcloud.conf.j2
+    dest: /etc/caddy/vhosts/{{ inventory_hostname }}.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: "restart caddy"

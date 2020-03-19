@@ -7,6 +7,11 @@
   roles:
     - auyfan-buster
 
+- hosts: all
+  become: yes
+  roles:
+    - common
+
 #
 # Specific applications
 #
@@ -17,3 +22,9 @@
     - php-fpm
     - web-server
     - nextcloud
+
+  handlers:
+    - name: restart caddy
+      systemd:
+        name: caddy
+        state: restarted
