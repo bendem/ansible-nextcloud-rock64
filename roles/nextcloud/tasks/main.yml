@@ -49,7 +49,7 @@
 - name: "create nextcloud database user"
   postgresql_user:
     name: "www-data"
-    password: 1234
+    password: "1234"
     role_attr_flags: "LOGIN"
   become_user: "postgres"
 
