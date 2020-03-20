@@ -1,4 +1,12 @@
 ---
+- assert:
+    that:
+      - nextcloud_vhost | length > 0
+      - nextcloud_admin_username | length > 0
+      - nextcloud_admin_email | length > 0
+      - nextcloud_admin_password | length > 0
+  delegate_to: local
+
 - name: download nextcloud
   get_url:
     url: "https://download.nextcloud.com/server/releases/nextcloud-{{ nextcloud_version }}.tar.bz2"
@@ -26,14 +34,14 @@
   file:
     path: /var/www/nextcloud/data
     state: directory
-    owner: root
+    owner: www-data
     group: www-data
-    mode: 0770
+    mode: 0750
 
 - name: nextcloud has write access where needed
   file:
     path: "/var/www/nextcloud/{{ item }}"
-    mode: 0770
+    owner: www-data
   with_items:
     - config
     - apps
@@ -53,20 +61,45 @@
   become_user: "postgres"
 
 - name: run occ install
-  command: php /var/www/nextcloud/occ -v maintenance:install \
-    --database=pgsql \
-    --database-name=nextcloud \
-    --database-pass=1234 \
-    --database-user=www-data \
-    --admin-user=bendem \
-    --admin-email=online+arf@bendem.be \
-    --admin-pass=1234
-  args:
+  command:
+    argv: "{{ nextcloud_command + [
+      'maintenance:install',
+      '--database=pgsql',
+      '--database-name=nextcloud',
+      '--database-pass=1234',
+      '--database-user=www-data',
+      '--admin-user=' + nextcloud_admin_username,
+      '--admin-email=' + nextcloud_admin_email,
+      '--admin-pass=' + nextcloud_admin_password,
+    ] }}"
     creates: /var/www/nextcloud/data/index.html
   become_user: www-data
 
-- name: nextcloud accepts {{ inventory_hostname }} domain
-  command: php /var/www/nextcloud/occ config:system:set trusted_domains 1 --value="{{ inventory_hostname }}"
+- name: install apps
+  command:
+    argv: "{{ nextcloud_command + [ 'app:install', item ] }}"
+  become_user: www-data
+  register: app_install
+  changed_when: "'already installed' not in app_install.stdout"
+  with_items: []
+    # -
+
+- name: run maintenance commands after install apps
+  command:
+    argv: "{{ nextcloud_command + [ 'db:add-missing-indices' ] }}"
+  become_user: www-data
+  register: output
+  changed_when: '"\nAdding " in output.stdout'
+
+- name: run maintenance commands after install apps
+  command:
+    argv: "{{ nextcloud_command + [ 'db:convert-filecache-bigint' ] }}"
+  become_user: www-data
+  register: output
+  changed_when: 'output.stdout != "All tables already up to date!"'
+
+- name: nextcloud accepts {{ nextcloud_vhost }} domain
+  command: php /var/www/nextcloud/occ config:system:set trusted_domains 1 --value="{{ nextcloud_vhost }}"
   become_user: www-data
 
 - name: nextcloud systemd cron exists
@@ -91,10 +124,22 @@
   command: php /var/www/nextcloud/occ config:app:set core backgroundjobs_mode --value=cron
   become_user: www-data
 
+- name:
+  copy:
+    src: "{{ item }}"
+    dest: "/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - etc/php/7.3/fpm/conf.d/50-nextcloud.ini
+    - etc/php/7.3/fpm/pool.d/www-nextcloud.conf
+  notify: "restart php"
+
 - name: install nextcloud vhost
   template:
     src: etc/caddy/vhosts/nextcloud.conf.j2
-    dest: /etc/caddy/vhosts/{{ inventory_hostname }}.conf
+    dest: /etc/caddy/vhosts/{{ nextcloud_vhost }}.conf
     owner: root
     group: root
     mode: 0644

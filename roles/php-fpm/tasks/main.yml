@@ -3,6 +3,7 @@
   apt:
     pkg:
       - php{{ php_version }}-cli
+      - php{{ php_version }}-imagick
       - php{{ php_version }}-fpm
       - php{{ php_version }}-bz2
       - php{{ php_version }}-curl
@@ -14,4 +15,6 @@
       - php{{ php_version }}-pgsql
       - php{{ php_version }}-xml
       - php{{ php_version }}-zip
+      - libmagickcore-6.q16-6-extra
     state: present
+  notify: "restart php"

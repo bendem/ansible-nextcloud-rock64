@@ -21,6 +21,8 @@
     src: /opt/caddy.tar.gz
     dest: /opt/caddy
     remote_src: true
+    creates: /opt/caddy/caddy
+  notify: "restart caddy"
 
 - name: link caddy
   file:
@@ -30,6 +32,7 @@
     owner: root
     group: root
     mode: 0755
+  notify: "restart caddy"
 
 - name: create configuration home
   file:
@@ -54,6 +57,7 @@
     owner: root
     group: www-data
     mode: 0640
+  notify: "restart caddy"
 
 - name: check caddy env
   stat:
@@ -73,6 +77,7 @@
     group: www-data
     mode: 0650
   when: not caddy_stat.stat.exists
+  notify: "restart caddy"
 
 - name: create caddypath
   file:
@@ -111,6 +116,7 @@
     - etc/caddy/realip-cloudflare.conf
     - etc/caddy/tls-cloudflare.conf
     - var/www/dummy/index.txt
+  notify: "restart caddy"
 
 - name: create systemd service
   copy:
@@ -119,10 +125,13 @@
     owner: root
     group: root
     mode: 0644
+  register: caddy_create_service
 
-- name: start caddy
+- debug:
+    var: caddy_create_service.changed
+
+- name: enable caddy
   systemd:
     name: caddy
-    state: started
-    daemon_reload: true
+    daemon_reload: "{{ caddy_create_service.changed }}"
     enabled: true

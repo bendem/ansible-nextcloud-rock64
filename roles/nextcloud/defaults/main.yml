@@ -1,2 +1,7 @@
 nextcloud_version: 18.0.2
 nextcloud_archive_hash: "d033660923dd27106ec64bff0e3afa2f595bd1b9661b7ea7882a1a33006ecb81"
+nextcloud_command:
+  - php
+  - /var/www/nextcloud/occ
+  - --verbose
+  - --no-interaction

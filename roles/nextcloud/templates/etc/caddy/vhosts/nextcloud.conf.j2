@@ -1,7 +1,7 @@
-{{ inventory_hostname }} {
+{{ nextcloud_vhost }} {
     root /var/www/nextcloud
-    log /var/log/caddy/{{ inventory_hostname }}_access.log
-    errors /var/log/caddy/{{ inventory_hostname }}_errors.log
+    log /var/log/caddy/{{ nextcloud_vhost }}_access.log
+    errors /var/log/caddy/{{ nextcloud_vhost }}_errors.log
 
     import ../tls-cloudflare.conf
     import ../realip-cloudflare.conf

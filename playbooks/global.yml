@@ -21,9 +21,25 @@
     - database-server
     - php-fpm
     - web-server
-    - nextcloud
+
+    - role: nextcloud
+      vars:
+        nextcloud_vhost: "arf.home.bendem.be"
+        nextcloud_admin_username: "bendem"
+        nextcloud_admin_email: "online+nextcloud-arf@bendem.be"
+        nextcloud_admin_password: "1234"
 
   handlers:
+    - name: restart postgresql@11-main
+      systemd:
+        name: postgresql@11-main
+        state: restarted
+
+    - name: restart php
+      systemd:
+        name: php7.3-fpm
+        state: restarted
+
     - name: restart caddy
       systemd:
         name: caddy

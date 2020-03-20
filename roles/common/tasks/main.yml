@@ -1,13 +1,17 @@
+- locale_gen:
+    name: en_GB.UTF-8
+
 - hostname:
     name: "{{ inventory_hostname }}"
 
 - name: install default packages
   apt:
     name:
+      - bash-completion
       - curl
       - git
       - gpg
       - htop
+      - lvm2
       - man
       - tmux
-      - bash-completion
