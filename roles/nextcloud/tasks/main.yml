@@ -99,7 +99,22 @@
   changed_when: 'output.stdout != "All tables already up to date!"'
 
 - name: nextcloud accepts {{ nextcloud_vhost }} domain
-  command: php /var/www/nextcloud/occ config:system:set trusted_domains 1 --value="{{ nextcloud_vhost }}"
+  command:
+    argv: "{{ nextcloud_command + [
+      'config:system:set',
+      'trusted_domains',
+      '1',
+      '--value=' + nextcloud_vhost,
+    ] }}"
+  become_user: www-data
+
+- name: nextcloud uses APCu
+  command:
+    argv: "{{ nextcloud_command + [
+      'config:system:set',
+      'memcache.local',
+      '--value=\\OC\\Memcache\\APCu',
+    ] }}"
   become_user: www-data
 
 - name: nextcloud systemd cron exists

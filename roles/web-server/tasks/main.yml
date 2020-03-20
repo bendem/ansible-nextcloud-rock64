@@ -115,6 +115,7 @@
     - etc/caddy/gzip.conf
     - etc/caddy/realip-cloudflare.conf
     - etc/caddy/tls-cloudflare.conf
+    - etc/caddy/strict-headers.conf
     - var/www/dummy/index.txt
   notify: "restart caddy"
 

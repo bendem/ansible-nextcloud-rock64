@@ -6,11 +6,21 @@
     import ../tls-cloudflare.conf
     import ../realip-cloudflare.conf
     import ../gzip.conf
-    
+
     fastcgi / /var/run/php/php{{ php_version }}-fpm.sock php
+
+    header / {
+        Strict-Transport-Security "max-age=31536000"
+        # Content-Security-Policy "default-src 'none'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src https: data:; media-src 'self'; frame-src 'none'; font-src data: 'self'; connect-src 'self'"
+    }
 
     internal /data
     internal /config
+
+    redir 301 {
+        /.well-known/carddav /remote.php/dav/
+        /.well-known/caldav  /remote.php/dav/
+    }
 
     # rewrite {
     #     if {path} not_starts_with /assets

@@ -3,12 +3,13 @@
   apt:
     pkg:
       - php{{ php_version }}-cli
-      - php{{ php_version }}-imagick
-      - php{{ php_version }}-fpm
+      - php{{ php_version }}-apcu
       - php{{ php_version }}-bz2
       - php{{ php_version }}-curl
-      - php{{ php_version }}-intl
+      - php{{ php_version }}-fpm
       - php{{ php_version }}-gd
+      - php{{ php_version }}-imagick
+      - php{{ php_version }}-intl
       - php{{ php_version }}-json
       - php{{ php_version }}-mbstring
       - php{{ php_version }}-opcache
