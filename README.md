@@ -1,6 +1,14 @@
 # Nextcloud setup on rock64
 
 
+## Assumptions
+
+* The config was written for a rock64 4GB, if you have less RAM, probably worth fixing the config (php-fpm and postgresql)
+* I use cloudflare for DNS and thus request the LE certificates through caddy's plugin for it. That allows me to request a certificate for a server not publicly exposed to the internet.
+* I have a dns record set for my rock64
+* This is for a local network so I didn't go crazy on firewalls and fail2ban and stuff
+
+
 ## Before starting
 
 ### Flash the board's SPI to be able to boot from USB
@@ -42,7 +50,7 @@ ansible-playbook -e _vars.yml playbooks/global.yml
 ```
 
 
-### Formatting disks
+### Formatting disks with LVM
 
 ```bash
 # on all disks
@@ -65,3 +73,11 @@ Once the disks are formatted, you can mount them either
   * copy files
   * remount the partition over the existing target folder
   * restart the services
+
+## Still to do
+
+* `[ ]` Fix task changed when updating nc config
+* `[ ]` Make a playbook to setup LVM?
+* `[ ]` Backups
+* `[ ]` Default apps to install
+* `[ ]` Static IP
