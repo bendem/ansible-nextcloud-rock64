@@ -2,3 +2,7 @@ nextcloud_vhost: "nextcloud.example.com"
 nextcloud_admin_username: "admin"
 nextcloud_admin_email: "admin@example.com"
 nextcloud_admin_password: "1234"
+nextcloud_apps:
+  - dav
+  - deck
+  - news

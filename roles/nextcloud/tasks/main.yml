@@ -81,8 +81,8 @@
   become_user: www-data
   register: app_install
   changed_when: "'already installed' not in app_install.stdout"
-  with_items: []
-    # -
+  failed_when: "'Error' in app_install.stdout"
+  with_items: "{{ nextcloud_apps }}"
 
 - name: run maintenance commands after install apps
   command:
