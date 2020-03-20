@@ -76,9 +76,9 @@ Once the disks are formatted, you can mount them either
 
 ## Still to do
 
-* `[ ]` Fix task changed when updating nc config
-* `[ ]` Make a playbook to setup LVM?
-* `[ ]` Backups
-* `[x]` Default apps to install
-* `[ ]` Static IP
-* `[ ]` Prevent resizing the system's partition to be able to use the free space in the nextcloud's LVM VG
+* [ ] Fix task changed when updating nc config
+* [ ] Make a playbook to setup LVM?
+* [ ] Backups
+* [x] Default apps to install
+* [ ] Static IP
+* [ ] Prevent resizing the system's partition to be able to use the free space in the nextcloud's LVM VG
