@@ -1,0 +1,50 @@
+body,
+#app-content .body {
+  font-size: unset;
+}
+
+#app-content .utils .title h1 a {
+  font-size: unset;
+  line-height: unset;
+  padding-top: unset;
+}
+
+#appmenu li a {
+  width: 7ch;
+}
+
+#recommendations {
+  height: unset !important;
+}
+
+#app-sidebar .app-sidebar-header__desc {
+  height: unset !important;
+}
+
+/* compact tables */
+#fileList tr td.selection > .selectCheckBox + label, .select-all + label,
+#fileList td a a.action,
+#fileList td a a.action.action-menu,
+table td.filename .nametext, .modified, .column-last > span:first-child
+{
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.searchbox input[type="search"]:focus,
+.searchbox input[type="search"]:active,
+.searchbox input[type="search"]:valid {
+  width: 20ch;
+}
+
+#header .header-left > nav > .menu #apps > ul li {
+  position: relative;
+}
+#header .header-left > nav > .menu #apps > ul li a {
+  height: unset;
+}
+
+#header .header-left > nav > .menu #apps > ul li a span {
+  position: absolute;
+  left: 3ch;
+}

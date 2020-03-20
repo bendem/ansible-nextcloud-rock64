@@ -124,18 +124,6 @@
   command: php /var/www/nextcloud/occ config:app:set core backgroundjobs_mode --value=cron
   become_user: www-data
 
-- name:
-  copy:
-    src: "{{ item }}"
-    dest: "/{{ item }}"
-    owner: root
-    group: root
-    mode: 0644
-  with_items:
-    - etc/php/7.3/fpm/conf.d/50-nextcloud.ini
-    - etc/php/7.3/fpm/pool.d/www-nextcloud.conf
-  notify: "restart php"
-
 - name: install nextcloud vhost
   template:
     src: etc/caddy/vhosts/nextcloud.conf.j2
