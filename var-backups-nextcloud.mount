@@ -1,0 +1,6 @@
+[Mount]
+What=/dev/vg.nextcloud/nc-backups
+Where=/var/backups/nextcloud
+
+[Install]
+WantedBy=multi-user.target

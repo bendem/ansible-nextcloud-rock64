@@ -1,0 +1,117 @@
+#!/bin/bash
+
+set -euo pipefail
+# set -x
+
+umask 0007
+
+function current_date() {
+    date --iso-8601=seconds | sed 's/+00:00/Z/'
+}
+
+function full_backup() {
+    local db="$1"
+    local current="$2"
+
+    echo "doing ful backup of $db at $current"
+
+    pg_dump $db | xz -9 > "$db-full-$current.sql.xz"
+    echo "$current" > "$db.latest"
+}
+
+function incremental_backup() {
+    local db="$1"
+    local current="$2"
+    local latest="$3"
+
+    echo "doing incremental backup of $db from $latest to $current"
+
+    diff <(xzcat "$db-full-$latest.sql.xz") <(pg_dump "$db") | xz -e > "$db-inc-$latest-to-$current.patch.xz"
+}
+
+function should_do_full() {
+    local current="$1"
+    local last="$2"
+
+    if [[ ${current/T*/} != ${last/T*/} ]]; then
+        exit 1
+    fi
+}
+
+function backup() {
+    local db="$1"
+    local current="$(current_date)"
+    local latest="$(cat $db.latest)"
+    local latest_exists=$?
+
+    if [[ $latest_exists != 0 ]] && ! should_do_full "$current" "$latest"; then
+        incremental_backup "$db" "$current" "$db"
+    else
+        full_backup "$db" "$current"
+    fi
+}
+
+function full_from_incremental() {
+    local file="$1"
+    local db=${file/-inc-*/}
+    local dates=${file/$db-inc-/}
+    local full=${dates/-to-*/}
+    local inc_with_extension=${dates/*-to-/}
+    local inc=${inc_with_extension/.patch.xz/}
+
+    unxz -k "$db-full-$full.sql.xz"
+    patch -o- "$db-full-$full.sql" <(xzcat $file) 2>/dev/null
+    rm "$db-full-$full.sql"
+}
+
+function help() {
+    echo
+    echo "Runs pg_dump, handling incremental backups to save space."
+    echo
+    echo "Usage:"
+    echo
+    echo "    $(basename $0) [backup|full|inc] database"
+    echo "    $(basename $0) [compute] incremental_backup_file"
+    echo
+    echo " backup        will do a full backup if none has been done yet or for the day"
+    echo " full          will take a full backup"
+    echo " inc           will take an incremental backup, even if there is no full for today"
+    echo " compute       will output a full backup by applying the given incremental backup to its full counterpart"
+    echo
+}
+
+if [[ $# != 2 ]]; then
+    help
+
+    if [[ $# == 0 ]]; then
+        exit
+    else
+       exit 2
+    fi
+fi
+
+command="$1"
+shift
+
+case "$command" in
+    "backup")
+        backup "$@"
+        ;;
+    "full")
+        full_backup "$1" "$(current_date)"
+        ;;
+    "inc")
+        if ! [ -f "$db.latest" ]; then
+            echo "no full backup to work from" >&2
+            exit 1
+        fi
+        incremental_backup "$1" "$(current_date)" "$(cat $1.latest)"
+        ;;
+    "compute")
+        full_from_incremental "$@"
+        ;;
+    *)
+        help
+        exit 2
+        ;;
+esac

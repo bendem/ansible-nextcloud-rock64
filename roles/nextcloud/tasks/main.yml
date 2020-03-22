@@ -46,19 +46,82 @@
     - config
     - apps
 
-- name: "create nextcloud database user"
+- name: "nextcloud has a database user"
   postgresql_user:
     name: "www-data"
     password: "1234"
     role_attr_flags: "LOGIN"
   become_user: "postgres"
 
-- name: "create nextcloud database"
+- name: "a backup user exists"
+  postgresql_user:
+    name: "backup"
+    role_attr_flags: "LOGIN"
+  become_user: "postgres"
+
+- name: "nextcloud has a database"
   postgresql_db:
     name: "nextcloud"
     encoding: "UTF-8"
     owner: "www-data"
   become_user: "postgres"
+
+- name: "the backup user can connect to the databse"
+  postgresql_privs:
+    database: "nextcloud"
+    role: "backup"
+    type: "database"
+    privs: "connect"
+  become_user: "postgres"
+
+- name: "the backup user will always have the right permissions"
+  postgresql_privs:
+    database: "nextcloud"
+    role: "backup"
+    objs: "tables,sequences"
+    privs: "select"
+    type: "default_privs"
+    schema: "public"
+    target_roles: "www-data"
+  become_user: "postgres"
+
+- name: "the backup directories exist"
+  file:
+    path: "/var/backups/{{ item }}"
+    state: "directory"
+    owner: "backup"
+    group: "backup"
+    mode: 0755
+  with_items:
+    - "nextcloud"
+    - "nextcloud/database"
+
+- name: "the backup script exists"
+  copy:
+    src: var/backups/nextcloud/database/backups
+    dest: /var/backups/nextcloud/database/backups
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "the nextcloud backup timer is in place"
+  copy:
+    src: "{{ item }}"
+    dest: "/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - etc/systemd/system/nextcloud-backup.timer
+    - etc/systemd/system/nextcloud-backup.service
+  register: nextcloud_backup_timer
+
+- name: "the systemd backup timer is active"
+  systemd:
+    name: "nextcloud-backup.timer"
+    state: "started"
+    enabled: true
+    daemon_reload: "{{ nextcloud_backup_timer.changed }}"
 
 - name: run occ install
   command:
@@ -83,6 +146,8 @@
   changed_when: "'already installed' not in app_install.stdout"
   failed_when: "'Error' in app_install.stdout"
   with_items: "{{ nextcloud_apps }}"
+  tags:
+    - nextcloud_apps
 
 - name: run maintenance commands after install apps
   command:

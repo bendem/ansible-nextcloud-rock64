@@ -1,0 +1,9 @@
+[Unit]
+Description=Nextcloud backup job
+Requires=postgresql@11-main.service
+
+[Service]
+User=backup
+Group=backup
+WorkingDirectory=/var/backups/nextcloud/database
+ExecStart=/var/backups/nextcloud/database/backups backup nextcloud

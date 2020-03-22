@@ -63,6 +63,11 @@ lvcreate -m 1 -n nc-postgresql -L 5G vg.nextcloud
 lvcreate -m 1 -n nc-data -L 20G vg.nextcloud
 
 mkfs.ext4 /dev/vg.nextcloud/nc-X
+
+# adding a disk
+vgextend vg.nextcloud /dev/sdX
+# adding part of a disk
+vgextend vg.nextcloud /dev/sda8
 ```
 
 Once the disks are formatted, you can mount them either
@@ -78,7 +83,7 @@ Once the disks are formatted, you can mount them either
 
 * [ ] Fix task changed when updating nc config
 * [ ] Make a playbook to setup LVM?
-* [ ] Backups
+* [x] Backups
 * [x] Default apps to install
 * [ ] Static IP
 * [ ] Prevent resizing the system's partition to be able to use the free space in the nextcloud's LVM VG

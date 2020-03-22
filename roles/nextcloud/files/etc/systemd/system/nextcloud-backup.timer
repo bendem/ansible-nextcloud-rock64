@@ -1,0 +1,9 @@
+[Unit]
+Description=Run Nextcloud backup every hour
+
+[Timer]
+Persistent=true
+OnCalendar=*-*-* *:00:00
+
+[Install]
+WantedBy=timers.target

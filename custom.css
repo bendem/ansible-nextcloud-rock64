@@ -48,3 +48,16 @@ table td.filename .nametext, .modified, .column-last > span:first-child
   position: absolute;
   left: 3ch;
 }
+
+
+
+/* mail */
+.app-content-list {
+    max-width: 25vw;
+}
+.app-content-list .app-content-list-item {
+    height: unset;
+}
+.mail-message-account-color {
+    height: 99% !important;
+}

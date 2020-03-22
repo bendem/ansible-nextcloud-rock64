@@ -1,0 +1,9 @@
+[Unit]
+Before=php7.3-fpm.service nextcloud-cron.service
+
+[Mount]
+What=/dev/vg.nextcloud/nc-data
+Where=/var/www/nextcloud/data
+
+[Install]
+WantedBy=multi-user.target
