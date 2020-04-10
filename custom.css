@@ -61,3 +61,14 @@ table td.filename .nametext, .modified, .column-last > span:first-child
     font-size: 15px;
     line-height: 1.5;
 }
+
+
+.app-calendar .fc-today > .fc-day-number {
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5;
+}
+.app-calendar .fc-day-number {
+  line-height: 1.5;
+  margin-right: 0.5ch;
+}
