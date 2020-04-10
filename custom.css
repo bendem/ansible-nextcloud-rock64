@@ -72,3 +72,8 @@ table td.filename .nametext, .modified, .column-last > span:first-child
   line-height: 1.5;
   margin-right: 0.5ch;
 }
+
+
+#app-settings .action-checkbox {
+  white-space: unset;
+}
