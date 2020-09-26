@@ -13,7 +13,7 @@ function full_backup() {
     local db="$1"
     local current="$2"
 
-    echo "doing ful backup of $db at $current"
+    echo "doing full backup of $db at $current"
 
     pg_dump $db | xz -9 > "$db-full-$current.sql.xz"
     echo "$current" > "$db.latest"
@@ -51,6 +51,20 @@ function backup() {
     fi
 }
 
+function clean() {
+    local db="$1"
+
+    find . \
+        -name "$db-inc-*" \
+        -ctime +7 \
+        -exec rm {} \+
+    find . \
+        -name "$db-full-*" \
+        \! -name "$db-full-*-*-01T00*" \
+        -ctime +15 \
+        -exec rm {} \+
+}
+
 function full_from_incremental() {
     local file="$1"
     local db=${file/-inc-*/}
@@ -70,13 +84,14 @@ function help() {
     echo
     echo "Usage:"
     echo
-    echo "    $(basename $0) [backup|full|inc] database"
+    echo "    $(basename $0) [backup|full|inc|clean] database"
     echo "    $(basename $0) [compute] incremental_backup_file"
     echo
     echo " backup        will do a full backup if none has been done yet or for the day"
     echo " full          will take a full backup"
     echo " inc           will take an incremental backup, even if there is no full for today"
     echo " compute       will output a full backup by applying the given incremental backup to its full counterpart"
+    echo " clean         will delete incrementals older than 7 days and full older than 15 days (keeping the first full of each month)"
     echo
 }
 
@@ -109,6 +124,9 @@ case "$command" in
         ;;
     "compute")
         full_from_incremental "$@"
+        ;;
+    "clean")
+        clean "$@"
         ;;
     *)
         help

@@ -5,5 +5,7 @@ Requires=postgresql@11-main.service
 [Service]
 User=backup
 Group=backup
+Type=oneshot
 WorkingDirectory=/var/backups/nextcloud/database
 ExecStart=/var/backups/nextcloud/database/backups backup nextcloud
+ExecStartPost=/var/backups/nextcloud/database/backups clean nextcloud
