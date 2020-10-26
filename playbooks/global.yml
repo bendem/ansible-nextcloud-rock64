@@ -24,9 +24,9 @@
     - nextcloud
 
   handlers:
-    - name: restart postgresql@11-main
+    - name: restart postgresql@12-main
       systemd:
-        name: postgresql@11-main
+        name: postgresql@12-main
         state: restarted
 
     - name: restart php

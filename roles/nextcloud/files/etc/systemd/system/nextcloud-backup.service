@@ -1,6 +1,6 @@
 [Unit]
 Description=Nextcloud backup job
-Requires=postgresql@11-main.service
+Requires=postgresql@12-main.service
 
 [Service]
 User=backup

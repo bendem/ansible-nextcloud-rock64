@@ -1,35 +1,31 @@
 ---
-#
-# those repos do not contain arm builds
-#
-# - name: add postgresql apt key
-#   apt_key:
-#     url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+- name: add postgresql apt key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
 
-# - name: add postgresql apt source
-#   apt_repository:
-#     repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+- name: add postgresql apt source
+  apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
 
 - name: install postgresql
   apt:
-    pkg: postgresql-11
-  notify: restart postgresql@11-main
+    pkg: postgresql-12
+  notify: restart postgresql@12-main
 
 - name: install python3-psycopg2 (ansible dependency)
   apt:
     pkg: python3-psycopg2
 
-- name: enable postgresql@11-main
+- name: enable postgresql@12-main
   systemd:
-    name: postgresql@11-main
+    name: postgresql@12-main
     enabled: yes
-  notify: restart postgresql@11-main
 
 - name: copy tuned pg config
   copy:
-    src: etc/postgresql/11/main/conf.d/postgresql-rock64.conf
-    dest: /etc/postgresql/11/main/conf.d/postgresql-rock64.conf
+    src: etc/postgresql/conf.d/postgresql-rock64.conf
+    dest: /etc/postgresql/12/main/conf.d/postgresql-rock64.conf
     owner: postgres
     group: postgres
     mode: 0644
-  notify: restart postgresql@11-main
+  notify: restart postgresql@12-main

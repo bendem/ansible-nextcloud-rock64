@@ -1,9 +1,9 @@
 [Unit]
-Before=postgresql@11-main.service
+Before=postgresql@12-main.service
 
 [Mount]
 What=/dev/vg.nextcloud/nc-postgresql
-Where=/var/lib/postgresql/11/main
+Where=/var/lib/postgresql
 
 [Install]
 WantedBy=multi-user.target
