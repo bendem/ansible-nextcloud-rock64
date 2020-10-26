@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -Eeuo pipefail
 # set -x
 
 umask 0007
@@ -25,16 +25,18 @@ function incremental_backup() {
     local latest="$3"
 
     echo "doing incremental backup of $db from $latest to $current"
-
-    diff <(xzcat "$db-full-$latest.sql.xz") <(pg_dump "$db") | xz -e > "$db-inc-$latest-to-$current.patch.xz"
+    {
+        diff <(xzcat "$db-full-$latest.sql.xz") <(pg_dump "$db") \
+            || true
+    } | xz -e > "$db-inc-$latest-to-$current.patch.xz"
 }
 
 function should_do_full() {
     local current="$1"
     local last="$2"
 
-    if [[ ${current/T*/} != ${last/T*/} ]]; then
-        exit 1
+    if [[ "${current/T*/}" == "${last/T*/}" ]]; then
+        return 1
     fi
 }
 
@@ -44,8 +46,8 @@ function backup() {
     local latest="$(cat $db.latest)"
     local latest_exists=$?
 
-    if [[ $latest_exists != 0 ]] && ! should_do_full "$current" "$latest"; then
-        incremental_backup "$db" "$current" "$db"
+    if [[ $latest_exists == 0 ]] && ! should_do_full "$current" "$latest"; then
+        incremental_backup "$db" "$current" "$latest"
     else
         full_backup "$db" "$current"
     fi
@@ -57,12 +59,12 @@ function clean() {
     find . \
         -name "$db-inc-*" \
         -ctime +7 \
-        -exec rm {} \+
+        -exec rm -v {} \+
     find . \
         -name "$db-full-*" \
         \! -name "$db-full-*-*-01T00*" \
         -ctime +15 \
-        -exec rm {} \+
+        -exec rm -v {} \+
 }
 
 function full_from_incremental() {
