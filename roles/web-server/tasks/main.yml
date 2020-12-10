@@ -1,7 +1,12 @@
 ---
 - name: download caddy
   get_url:
-    url: "{{ caddy_download_url }}/{{ caddy_arch }}?license={{ caddy_license }}&telemetry=off&plugins={{ caddy_plugins | join(',') }}"
+    # https://caddyserver.com/api/download?os=linux&arch=arm64&p=github.com%2Fcaddy-dns%2Fcloudflare&idempotency=7099745858578
+    url: "{{ caddy_download_url }}\
+    ?os=linux\
+    &arch={{ caddy_arch }}\
+    &telemetry=off\
+    &p={{ caddy_plugins | join('&p=') }}"
     dest: /opt/caddy.tar.gz
     owner: root
     group: root
@@ -112,7 +117,7 @@
     mode: 0644
   with_items:
     - etc/caddy/vhosts/dummy.conf
-    - etc/caddy/gzip.conf
+    - etc/caddy/content-encoding.conf
     - etc/caddy/realip-cloudflare.conf
     - etc/caddy/tls-cloudflare.conf
     - etc/caddy/strict-headers.conf

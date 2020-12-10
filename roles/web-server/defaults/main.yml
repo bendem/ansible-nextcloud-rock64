@@ -1,9 +1,8 @@
 caddy_plugins:
-  - http.expires
-  - http.realip
-  - tls.dns.cloudflare
+  - github.com/kirsch33/realip
+  - github.com/caddy-dns/cloudflare
 
 
 caddy_license: personal
 caddy_arch: arm64
-caddy_download_url: 'https://caddyserver.com/download/linux'
+caddy_download_url: 'https://caddyserver.com/api/download'

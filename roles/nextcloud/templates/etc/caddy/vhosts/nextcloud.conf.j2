@@ -1,25 +1,25 @@
 {{ nextcloud_vhost }} {
-    root /var/www/nextcloud
-    log /var/log/caddy/{{ nextcloud_vhost }}_access.log
-    errors /var/log/caddy/{{ nextcloud_vhost }}_errors.log
+    root * /var/www/nextcloud
+    log {
+        output file /var/log/caddy/{{ nextcloud_vhost }}.log
+    }
 
     import ../tls-cloudflare.conf
     import ../realip-cloudflare.conf
-    import ../gzip.conf
+    import ../content-encoding.conf
 
-    fastcgi / /var/run/php/php{{ php_version }}-fpm.sock php
+    php_fastcgi unix//var/run/php/php{{ php_version }}-fpm.sock
 
     header / {
         Strict-Transport-Security "max-age=31536000"
         # Content-Security-Policy "default-src 'none'; script-src 'self' 'unsafe-inline'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src https: data:; media-src 'self'; frame-src 'none'; font-src data: 'self'; connect-src 'self'"
     }
 
-    internal /data
-    internal /config
+    redir /.well-known/carddav to /remote.php/dav/ permanent
+    redir /.well-known/caldav to /remote.php/dav/ permanent
 
-    redir 301 {
-        /.well-known/carddav /remote.php/dav/
-        /.well-known/caldav  /remote.php/dav/
+    file_server {
+        hide /data /config
     }
 
     # rewrite {

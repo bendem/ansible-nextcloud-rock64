@@ -1,3 +1,11 @@
-import vhosts/*.conf
+{
+    admin off
+    storage file_system {
+        root /etc/caddy/ssl
+    }
 
-# vim: ft=conf
+    # order it really early since we use it to filter clients
+    order realip before header
+}
+
+import vhosts/*.conf
