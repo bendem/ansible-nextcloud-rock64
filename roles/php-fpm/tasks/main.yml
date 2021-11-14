@@ -27,7 +27,7 @@
     owner: root
     group: root
     mode: 0644
-  with_items:
-    - etc/php/7.3/fpm/conf.d/50-rock64.ini
-    - etc/php/7.3/fpm/pool.d/www-rock64.conf
+  loop:
+    - etc/php/{{ php_version }}/fpm/conf.d/50-rock64.ini
+    - etc/php/{{ php_version }}/fpm/pool.d/www-rock64.conf
   notify: "restart php"

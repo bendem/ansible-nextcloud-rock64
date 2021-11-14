@@ -3,20 +3,20 @@
 # Global stuff
 #
 - hosts: auyfan_buster
-  become: yes
+  become: true
   roles:
     - auyfan-buster
 
 - hosts: all
-  become: yes
+  become: true
   roles:
     - common
 
 #
 # Specific applications
 #
-- hosts: arf.home.bendem.be
-  become: yes
+- hosts: nextcloud
+  become: true
   roles:
     - database-server
     - php-fpm
@@ -24,14 +24,14 @@
     - nextcloud
 
   handlers:
-    - name: restart postgresql@12-main
+    - name: restart postgresql@{{ postgresql_version }}-main
       systemd:
-        name: postgresql@12-main
+        name: postgresql@{{ postgresql_version }}-main
         state: restarted
 
     - name: restart php
       systemd:
-        name: php7.3-fpm
+        name: php{{ php_version }}-fpm
         state: restarted
 
     - name: restart caddy

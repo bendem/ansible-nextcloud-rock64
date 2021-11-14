@@ -1,5 +1,5 @@
-nextcloud_version: 20.0.1
-nextcloud_archive_hash: "96c6b50e1e676e46cec82d8f8ff1abd5eef9dfa00580081b6c640612c3ff2efc"
+nextcloud_version: 20.0.13
+nextcloud_archive_hash: "e9bd524c072309c84ead253f12b6840392db570d8503d6f3427544af5428b196"
 nextcloud_command:
   - php
   - /var/www/nextcloud/occ

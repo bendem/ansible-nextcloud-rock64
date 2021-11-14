@@ -125,8 +125,8 @@
   notify: "restart caddy"
 
 - name: create systemd service
-  copy:
-    src: etc/systemd/system/caddy.service
+  template:
+    src: etc/systemd/system/caddy.service.j2
     dest: /etc/systemd/system/caddy.service
     owner: root
     group: root

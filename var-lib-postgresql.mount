@@ -1,5 +1,5 @@
 [Unit]
-Before=postgresql@12-main.service
+Before=postgresql@{{ postgresql_version }}-main.service
 
 [Mount]
 What=/dev/vg.nextcloud/nc-postgresql

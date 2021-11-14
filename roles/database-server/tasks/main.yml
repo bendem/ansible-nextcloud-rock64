@@ -9,23 +9,23 @@
 
 - name: install postgresql
   apt:
-    pkg: postgresql-12
-  notify: restart postgresql@12-main
+    pkg: postgresql-{{ postgresql_version }}
+  notify: restart postgresql@{{ postgresql_version }}-main
 
 - name: install python3-psycopg2 (ansible dependency)
   apt:
     pkg: python3-psycopg2
 
-- name: enable postgresql@12-main
+- name: enable postgresql@{{ postgresql_version }}-main
   systemd:
-    name: postgresql@12-main
+    name: postgresql@{{ postgresql_version }}-main
     enabled: yes
 
 - name: copy tuned pg config
   copy:
     src: etc/postgresql/conf.d/postgresql-rock64.conf
-    dest: /etc/postgresql/12/main/conf.d/postgresql-rock64.conf
+    dest: /etc/postgresql/{{ postgresql_version }}/main/conf.d/postgresql-rock64.conf
     owner: postgres
     group: postgres
     mode: 0644
-  notify: restart postgresql@12-main
+  notify: restart postgresql@{{ postgresql_version }}-main

@@ -1,5 +1,5 @@
 [Unit]
-Before=php7.3-fpm.service nextcloud-cron.service
+Before=php{{ php_version }}-fpm.service nextcloud-cron.service
 
 [Mount]
 What=/dev/vg.nextcloud/nc-data
