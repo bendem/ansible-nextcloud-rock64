@@ -29,5 +29,5 @@
     mode: 0644
   loop:
     - etc/php/{{ php_version }}/fpm/conf.d/50-rock64.ini
-    - etc/php/{{ php_version }}/fpm/pool.d/www-rock64.conf
+    - etc/php/{{ php_version }}/fpm/pool.d/zz-www-rock64.conf
   notify: "restart php"
