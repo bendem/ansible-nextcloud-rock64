@@ -32,7 +32,7 @@
 
 - name: nextcloud has a place to store data
   file:
-    path: /var/www/nextcloud/data
+    path: /var/lib/nextcloud
     state: directory
     owner: www-data
     group: www-data
@@ -127,6 +127,7 @@
   command:
     argv: "{{ nextcloud_command + [
       'maintenance:install',
+      '--data-dir=/var/lib/nextcloud',
       '--database=pgsql',
       '--database-name=nextcloud',
       '--database-pass=1234',
@@ -135,7 +136,7 @@
       '--admin-email=' + nextcloud_admin_email,
       '--admin-pass=' + nextcloud_admin_password,
     ] }}"
-    creates: /var/www/nextcloud/data/index.html
+    creates: /var/lib/nextcloud/index.html
   become_user: www-data
 
 - name: install apps
